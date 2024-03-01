@@ -2,20 +2,20 @@ import './scss/styles.scss';
 
 // Модальное окно
 interface Modal {
-  modalCloseButton: HTMLButtonElement;
+  modalCloseButton: HTMLElement;
   modalContent: HTMLElement;
   openModal(currentModal: string): void;
   closeModal(): void;
-  changeModalContent(currentButton: HTMLElement): HTMLElement;
+  changeModalContent(changeButton: HTMLButtonElement): HTMLElement;
 }
 
 // Данные для карточек
 interface Card {
 	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
+	description?: string;
+	image?: string;
+	title?: string;
+	category?: string;
 	price: number;
 }
 
