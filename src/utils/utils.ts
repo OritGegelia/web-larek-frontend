@@ -2,15 +2,21 @@ export function pascalToKebab(value: string): string {
     return value.replace(/([a-z0–9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
+// Если строка и длиной больше 1 символа
+
 export function isSelector(x: any): x is string {
     return (typeof x === "string") && x.length > 1;
 }
+
+// Если результат null или undefined
 
 export function isEmpty(value: any): boolean {
     return value === null || value === undefined;
 }
 
 export type SelectorCollection<T> = string | NodeListOf<Element> | T[];
+
+// это querySelectorAll
 
 export function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
     if (isSelector(selectorElement)) {
@@ -26,6 +32,8 @@ export function ensureAllElements<T extends HTMLElement>(selectorElement: Select
 }
 
 export type SelectorElement<T> = T | string;
+
+// querySelector
 
 export function ensureElement<T extends HTMLElement>(selectorElement: SelectorElement<T>, context?: HTMLElement): T {
     if (isSelector(selectorElement)) {
@@ -44,10 +52,15 @@ export function ensureElement<T extends HTMLElement>(selectorElement: SelectorEl
     throw new Error('Unknown selector element');
 }
 
+
+// Клон темплейта
+
 export function cloneTemplate<T extends HTMLElement>(query: string | HTMLTemplateElement): T {
     const template = ensureElement(query) as HTMLTemplateElement;
     return template.content.firstElementChild.cloneNode(true) as T;
 }
+
+// формировалка имени по БЭМ
 
 export function bem(block: string, element?: string, modifier?: string): { name: string, class: string } {
     let name = block;

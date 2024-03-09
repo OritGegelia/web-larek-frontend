@@ -1,48 +1,44 @@
 import './scss/styles.scss';
 
-// Модальное окно
-interface Modal {
-  modalCloseButton: HTMLElement;
-  modalContent: HTMLElement;
-  openModal(currentModal: string): void;
-  closeModal(): void;
-  changeModalContent(changeButton: HTMLButtonElement): HTMLElement;
-}
+import { LarekApi } from './components/larekApi';
+import { API_URL, CDN_URL } from './utils/constants';
+import { EventEmitter } from './components/base/events';
+import { AppData } from './components/AppData';
+// проверь какой импорт в онотебенадо
+import { Page } from './components/page';
+import { Modal } from './components/common/modal';
+// тут тоже проверь
+import { cloneTemplate, createElement, ensureElement } from './utils/utils';
+// большой вопрос по Modal
+import { Basket } from './components/common/bascet';
+// возможно здесь понадобится что-то еще
 
-// Данные для карточек
-interface Card {
-	id: string;
-	description?: string;
-	image?: string;
-	title?: string;
-	category?: string;
-	price: number;
-}
+// доступ к функциям апи и эмиттера
+const events = new EventEmitter();
+const api = new LarekApi(API_URL, CDN_URL);
 
-// Интерфейс карточки
+// Темплейты
 
-interface CardList {
-	cards: Card[];
-	addCard(newCard: Card): HTMLElement;
-  addCardToBasket(currentCard: Card): HTMLElement;
-	deleteCard(cardID: string): void;
-	initializeCards(initialCards: Card[]): void;
-	showCard(card: Card): void;
-}
+// const cardCatalog = ensureElement<HTMLElement>('#card-catalog');
+// const cardPreview = ensureElement<HTMLElement>('#card-preview');
+// const cardBasket = ensureElement<HTMLElement>('#card-basket');
+// const basket = ensureElement<HTMLElement>('#basket');
+// const order = ensureElement<HTMLElement>('#order');
+// const contacts = ensureElement<HTMLElement>('#contacts');
+// const success = ensureElement<HTMLElement>('#success');
 
-// Данные для покупки
+// Глобальные контейнеры
 
-interface User {
-	address: string;
-	email: string;
-	phoneNumber: string | number;
-  payType: Boolean;
-}
+const page = new Page(document.body, events);
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events)
 
+const appData = new AppData(events);
 
-// Корзина
-interface Basket  {
-  changeButtonCondition(): void;
-  sendOrderData(userData: User[]): void;
-  paymentSum(price: number): number;
-}
+api
+	.getProductList()
+	.then(appData.setItems.bind(appData))
+  .then(products => {
+    console.log(products);
+    
+  })
+	.catch((err) => console.log(err));
