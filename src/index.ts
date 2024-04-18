@@ -1,44 +1,135 @@
 import './scss/styles.scss';
 
-import { LarekApi } from './components/larekApi';
+import { LarekApi } from './components/LarekApi';
 import { API_URL, CDN_URL } from './utils/constants';
-import { EventEmitter } from './components/base/events';
+import { EventEmitter } from './components/base/Events';
 import { AppData } from './components/AppData';
-// проверь какой импорт в онотебенадо
-import { Page } from './components/page';
-import { Modal } from './components/common/modal';
-// тут тоже проверь
+import { Page } from './components/Page';
 import { cloneTemplate, createElement, ensureElement } from './utils/utils';
-// большой вопрос по Modal
-import { Basket } from './components/common/bascet';
-// возможно здесь понадобится что-то еще
+import { ICard } from './types/myTypes';
+import { Card } from './components/Card';
+import { Modal } from './components/common/Modal';
+import { Basket } from './components/common/Basket';
 
 // доступ к функциям апи и эмиттера
 const events = new EventEmitter();
-const api = new LarekApi(API_URL, CDN_URL);
+const api = new LarekApi(CDN_URL, API_URL);
 
 // Темплейты
 
-// const cardCatalog = ensureElement<HTMLElement>('#card-catalog');
-// const cardPreview = ensureElement<HTMLElement>('#card-preview');
-// const cardBasket = ensureElement<HTMLElement>('#card-basket');
-// const basket = ensureElement<HTMLElement>('#basket');
-// const order = ensureElement<HTMLElement>('#order');
-// const contacts = ensureElement<HTMLElement>('#contacts');
-// const success = ensureElement<HTMLElement>('#success');
+const cardCatalog = ensureElement<HTMLTemplateElement>('#card-catalog');
+const cardPreview = ensureElement<HTMLTemplateElement>('#card-preview');
+const cardBasket = ensureElement<HTMLTemplateElement>('#card-basket');
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const basketList = ensureElement<HTMLElement>('.basket__list')
+const order = ensureElement<HTMLElement>('#order');
+const contacts = ensureElement<HTMLElement>('#contacts');
+const success = ensureElement<HTMLElement>('#success');
+const modalContent = ensureElement<HTMLElement>('#modal-container');
+const test = ensureElement<HTMLElement>('.basket');
 
 // Глобальные контейнеры
-
+const data = {};
 const page = new Page(document.body, events);
-const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events)
+const appData = new AppData(data, events);
+const modal = new Modal(modalContent, events);
+const basket = new Basket(cloneTemplate(basketTemplate), events);
 
-const appData = new AppData(events);
+// Отслеживаем ввсе собыития
+events.onAll(({ eventName, data }) => {
+	console.log(eventName, data);
+});
+
+// Отрисовка карточек на сраницу
+
+events.on('items:change', (items: ICard[]) => {
+	page.productList = items.map((item) => {
+		const card = new Card(cloneTemplate(cardCatalog), {
+			onClick: () => events.emit('card:select', item),
+		});
+		return card.render(item);
+	});
+});
+
+//Открытие корзины
+
+events.on('basket:open', (items: ICard[]) => {
+	modal.render({ content: basket.render() });
+});
+
+
+// Изменение корзины
+
+events.on('basketList:changed', (items: ICard[]) => {
+	const test = basket.items = items.map((item) => {
+		const card = new Card(cloneTemplate(cardBasket))
+		
+		return card.render({
+						title: item.title,
+						price: item.price
+					})
+	})
+ 
+
+})
+
+
+
+//Зщлучить данные для превью
+
+events.on('card:select', (item: ICard) => {
+	appData.setPreview(item);
+});
+
+// Изменение товара в модальном окне
+
+events.on('preview:changed', (item: ICard) => {
+	const showCard = (item: ICard) => {
+		const card = new Card(cloneTemplate(cardPreview), {
+			onClick: () => events.emit('item:add', item),
+		});
+		modal.render({ content: card.render({
+			image: item.image,
+			category: item.category,
+			title: item.title,
+			description: item.description,
+			price: item.price
+		}) 
+	});
+	};
+
+	if (item) {
+		api.getProductItem(item.id)
+				.then((result) => {
+						item.description = result.description;
+						showCard(item);
+				})
+				.catch((err) => {
+						console.error(err);
+				})
+} else {
+		modal.close();
+}
+});
+
+//  Добавить товар в корзину
+
+events.on('item:add', (item: ICard) => {
+	appData.addToBasket(item)
+	modal.close()
+})
+
+// Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', () => {
+	page.locked = true;
+});
+
+// ... и разблокируем
+events.on('modal:close', () => {
+	page.locked = false;
+});
 
 api
 	.getProductList()
 	.then(appData.setItems.bind(appData))
-  .then(products => {
-    console.log(products);
-    
-  })
 	.catch((err) => console.log(err));

@@ -1,28 +1,42 @@
-import { ICard } from "../types/myTypes";
-import { IEvents } from "./base/events";
-import { IBasket } from "./common/bascet";
+import { ICard, IOrder } from '../types/myTypes';
+import { Model } from './base/Model';
+import { IBasket } from './common/Basket';
 
-
-export class AppData {
+export class AppData extends Model<ICard> {
 	items: ICard[] = [];
-	// basket: IBasket = {
-	// 	items: [],
-	// 	total: 0,
-	// };
-	preview: ICard = null;
-	// order: IOrder = {
-	// 	email: '',
-	// 	phone: '',
-	// 	address: '',
-	// 	payment: 'card',
-	// 	total: 0,
-	// 	items: [],
-	// };
+	catalog: ICard[] = []
+	basket: ICard[] = []
 
-	constructor(protected events: IEvents) {}
+	preview: null| string;
+
+	order: IOrder = {
+		email: '',
+		phone: '',
+		address: '',
+		payment: 'card',
+		total: 0,
+		items: [],
+	};
 
 	setItems(items: ICard[]) {
 		this.items = items;
 		this.events.emit('items:change', this.items);
+		return this.items;
 	}
+
+	setPreview(item:ICard) {
+		this.preview = item.id;
+		this.emitChanges('preview:changed', item);
+	}
+
+	addToBasket(item: ICard) {
+		if (this.basket.includes(item)) return;
+		this.basket.push(item);
+		this.emitChanges('basketList:changed', this.basket);
+	}
+
+	getBasket() {
+		 return this.basket;
+	}
+
 }

@@ -1,4 +1,4 @@
-import { Api, ApiListResponse } from './base/api';
+import { Api, ApiListResponse } from './base/Api';
 import { ICard } from '../types/myTypes';
 
 
@@ -24,7 +24,7 @@ export class LarekApi extends Api implements ILarekApi {
 
 	getProductList(): Promise<ICard[]> {
 		return this.get('/product').then((data: ApiListResponse<ICard>) =>
-			data.items.map((item) => ({
+			data.items.map((item: ICard) => ({
 				...item,
 				image: this.cdn + item.image,
 			}))
