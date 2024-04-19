@@ -21,7 +21,7 @@ const cardCatalog = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreview = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasket = ensureElement<HTMLTemplateElement>('#card-basket');
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
-const basketList = ensureElement<HTMLElement>('.basket__list')
+
 const order = ensureElement<HTMLElement>('#order');
 const contacts = ensureElement<HTMLElement>('#contacts');
 const success = ensureElement<HTMLElement>('#success');
@@ -40,6 +40,9 @@ events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 });
 
+ 
+
+
 // Отрисовка карточек на сраницу
 
 events.on('items:change', (items: ICard[]) => {
@@ -51,17 +54,33 @@ events.on('items:change', (items: ICard[]) => {
 	});
 });
 
+//  Добавить товар в корзину
+
+events.on('item:add', (item: ICard) => {
+	appData.addToBasket(item)	
+	modal.close()
+})
+
 //Открытие корзины
 
-events.on('basket:open', (items: ICard[]) => {
-	modal.render({ content: basket.render() });
+events.on('basket:open', (items: HTMLElement[]) => {
+	console.log(`I'm appData.basket`);
+	console.log(appData.basket);
+	
+		
+	modal.render({ content: basket.render(
+  {items: appData.basket} 
+	)});
 });
 
 
 // Изменение корзины
 
 events.on('basketList:changed', (items: ICard[]) => {
-	const test = basket.items = items.map((item) => {
+
+	const basketList = ensureElement<HTMLElement>('.basket__list')
+
+	basket.items = items.map((item) => {
 		const card = new Card(cloneTemplate(cardBasket))
 		
 		return card.render({
@@ -69,8 +88,15 @@ events.on('basketList:changed', (items: ICard[]) => {
 						price: item.price
 					})
 	})
- 
 
+	console.log(`I'm your basket.items:`);
+	
+	console.log(basket.items);
+	
+ 
+	// basket.items.forEach((item) => {
+	// 	basketList.appendChild(item)
+	// })
 })
 
 
@@ -111,13 +137,6 @@ events.on('preview:changed', (item: ICard) => {
 		modal.close();
 }
 });
-
-//  Добавить товар в корзину
-
-events.on('item:add', (item: ICard) => {
-	appData.addToBasket(item)
-	modal.close()
-})
 
 // Блокируем прокрутку страницы если открыта модалка
 events.on('modal:open', () => {
