@@ -1,5 +1,5 @@
 import { Api, ApiListResponse } from './base/Api';
-import { ICard, ILarekApi } from '../types/myTypes';
+import { ICard, ILarekApi, IOrder, OrderResult} from '../types/myTypes';
 
 export class LarekApi extends Api implements ILarekApi {
 	readonly cdn: string;
@@ -23,5 +23,9 @@ export class LarekApi extends Api implements ILarekApi {
 				image: this.cdn + item.image,
 			}))
 		);
+	}
+
+	sendOrder(order: IOrder): Promise<OrderResult> {
+		return this.post('/order', order).then((data: OrderResult) => data);
 	}
 }

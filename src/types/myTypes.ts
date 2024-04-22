@@ -1,25 +1,41 @@
+// Типы
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
+export type OrderResult = Pick<IOrder, 'total'> & {
+	id: string;
+};
+
 // Модальное окно
 export interface IModal {
-	сloseButton: HTMLButtonElement;
-	_сontent: HTMLTemplateElement;
-	open(): void;
-	close(): void;
-	render(): HTMLElement;
+	content: HTMLElement;
 }
 
 // Корзина
 export interface IBasket {
-	_list: HTMLElement;
-	_total: HTMLElement;
-	_button: HTMLButtonElement;
+	total: number;
 	items: ICard[];
+}
+
+// Карточка в корзине
+
+export interface IBasketItem {
+	counter: number;
+	title: string;
+	price: number;
+}
+
+// Действия на клик
+
+export interface IAction {
+	onClick(event: MouseEvent): void;
 }
 
 // Интерфейс данных карточки
 export interface ICard {
 	id: string;
 	title: string;
-	price: number;
+	price: number | null;
 	description?: string;
 	image?: string;
 	category?: string;
@@ -35,15 +51,24 @@ export interface IPage {
 	_pageWrapper: HTMLElement;
 }
 
-// Данные для покупки
+// Работа с полями заказа
 
-export interface IOrder {
+export interface IOrder extends IContact, IPayment {
+	total: number;
+	items: string[];
+}
+
+// Контактные данные
+export interface IContact {
 	email: string;
 	phone: string;
-	address: string;
+}
+
+// Оплата
+
+export interface IPayment {
 	payment: string;
-	total: number;
-	items: [];
+	address: string;
 }
 
 // Апи Ларька
@@ -53,14 +78,20 @@ export interface ILarekApi {
 	getProductItem: (id: string) => Promise<ICard>;
 }
 
-// Общий класс работы с данными
-export interface IAppData {
-	items: ICard[];
-	catalog: ICard[];
-	basket: ICard[];
-	preview: null | string;
-	order: IOrder;
-	setItems(items: ICard[]): [];
-	setPreview(item: ICard): void;
-	addToBasket(item: ICard): [];
+// Общий класс работы с формами
+export interface IForm {
+	valid: boolean;
+	errors: string[];
+}
+
+// Завершение покупки
+
+export interface ISuccess {
+	totalPrice: number;
+}
+
+// Действия в последней модалке
+
+export interface ISuccessActions {
+	onClick: () => void;
 }
