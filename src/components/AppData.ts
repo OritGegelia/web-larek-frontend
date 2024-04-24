@@ -40,7 +40,7 @@ export class AppData extends Model<ICard> {
 
 	removeItem(id: string): void {
 		this.basket = this.basket.filter((item) => item.id !== id);
-		this.emitChanges('itemsListBasket: changed', this.basket);
+		this.emitChanges('basketList:changed', this.basket);
 	}
 
 	getTotal(): number {
@@ -82,6 +82,11 @@ export class AppData extends Model<ICard> {
 		this.validatePaymentForm();
 	}
 
+	setPaymentMethod(value: string): void {
+		this.order.payment = value;
+		this.validatePaymentForm();
+	}
+
 	setContacts(field: keyof IContact, value: string) {
 		this.order[field] = value;
 		this.validateContactsForm();
@@ -111,7 +116,7 @@ export class AppData extends Model<ICard> {
 
 	clearOrder(): void {
 		this.basket = [];
-		this.emitChanges('itemsListBasket: changed', this.basket);
+		this.emitChanges('basketList:changed', this.basket);
 		this.clearOrderForm();
 	}
 }

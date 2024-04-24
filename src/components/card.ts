@@ -2,7 +2,7 @@ import { IAction, ICard } from '../types/myTypes';
 import { Component } from './base/Component';
 import { ensureElement } from '../utils/utils';
 
-export class Card<T> extends Component<ICard> {
+export class Card extends Component<ICard> {
 	protected _id: HTMLElement;
 	protected _title: HTMLElement;
 	protected _price: HTMLElement;

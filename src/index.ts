@@ -115,6 +115,7 @@ events.on('order:open', () => {
 
 events.on('paymentMethod:changed', (paymentType: HTMLButtonElement) => {
 	paymentForm.setPaymentButton(paymentType.name)
+	appData.setPaymentMethod(paymentType.name);
 })
 
 // Переход к заполнению контактных данных при оформлении заказа

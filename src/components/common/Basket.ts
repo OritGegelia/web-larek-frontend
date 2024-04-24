@@ -1,5 +1,5 @@
 import { IAction, IBasket, IBasketItem, ICard } from '../../types/myTypes';
-import { ensureElement, createElement, cloneTemplate } from '../../utils/utils';
+import { ensureElement, cloneTemplate } from '../../utils/utils';
 import { Component } from '../base/Component';
 import { IEvents } from '../base/Events';
 
